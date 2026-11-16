@@ -286,6 +286,23 @@ variable "instance_creation_timeout" {
   default     = ""
 }
 
+variable "enable_instance_refresh" {
+  description = "When true, the Auto Scaling Group starts a rolling instance refresh whenever the launch template changes, and replaces scale-in protected instances too. The group then references the launch template's latest version number instead of $Latest, because Terraform sees no change in the $Latest alias and would never start a refresh. Requires buildkite_agent_enable_graceful_shutdown, because without the terminating lifecycle hook a refresh terminates instances immediately, in the middle of a job."
+  type        = bool
+  default     = false
+}
+
+variable "instance_refresh_min_healthy_percentage" {
+  description = "Percentage of the Auto Scaling Group capacity that must stay in service during an instance refresh. Only used when enable_instance_refresh is true."
+  type        = number
+  default     = 90
+
+  validation {
+    condition     = var.instance_refresh_min_healthy_percentage >= 0 && var.instance_refresh_min_healthy_percentage <= 100
+    error_message = "instance_refresh_min_healthy_percentage must be between 0 and 100."
+  }
+}
+
 # =============================================================================
 # SCHEDULED SCALING CONFIGURATION
 # =============================================================================
